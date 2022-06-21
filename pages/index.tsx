@@ -1,18 +1,43 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { useCallback } from 'react';
 import { useQuery } from "react-query";
 
 import { UserService } from "../src/services";
+import { AuthService,SignupParams } from "../src/services";
 
 import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
-  const { data: me } = useQuery("me", UserService.me, {
-    refetchInterval: 500,
-  });
+  const handleSignup = useCallback(() => {
+      AuthService.signup({
+        email: "hong@gmail.com", 
+        password: "111", 
+        name:"hong",
+        phoneNumber:"342", 
+        agreements: {
+          privacy: false,
+          ad: false,
+        }})
+    },[])
+  
+    const handleLogin = useCallback(() => {
+      AuthService.login({
+        email: "hong@gmail.com", 
+        password: "111"})
+    },[])
+  
 
-  console.log("내 정보입니다", me);
+  // const { data: meData } = useQuery("me", UserService.me);
+  // const { data: readData } = useQuery("me", ()=>UserService.read(10));
+  // const { status: signupStatus } = useQuery("signup", handleSignup);
+  // const { data: loginData ,status: loginStatus } = useQuery("login", handleLogin);
+
+  // console.log("signup", signupStatus);
+  // console.log("login", loginData,loginStatus );
+  // console.log("meData", meData );
+  // console.log("readData", readData );
 
   return (
     <div className={styles.container}>

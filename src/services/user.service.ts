@@ -1,4 +1,4 @@
-import axios from "axios";
+import {Axios}  from "./axios";
 import cookies from "js-cookie";
 
 class UserService {
@@ -8,8 +8,7 @@ class UserService {
       return;
     }
 
-    const { data } = await axios.get(
-      process.env.NEXT_PUBLIC_API_HOST + "/users/me",
+    const { data } = await Axios.get("/users/me",
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -21,9 +20,7 @@ class UserService {
   }
 
   async read(id: number) {
-    const { data } = await axios.get(
-      process.env.NEXT_PUBLIC_API_HOST + "/users/" + id
-    );
+    const { data } = await Axios.get(`/users/${id}`);
 
     return data;
   }

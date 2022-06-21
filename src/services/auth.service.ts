@@ -1,7 +1,7 @@
-import axios from "axios";
+import {Axios}  from "./axios";
 import cookies from "js-cookie";
 
-type SignupAgreements = {
+export type SignupAgreements = {
   privacy: boolean;
   ad:
     | {
@@ -12,6 +12,23 @@ type SignupAgreements = {
     | false;
 };
 
+export type SetCookies = {
+  type: "access" | "refresh"
+  token : string,
+  expires: number,
+}
+
+export type SignupParams = LoginParams & {
+  name: string,
+  phoneNumber: string,
+  agreements: SignupAgreements
+}
+
+export type LoginParams= {
+  email: string, 
+  password: string
+}
+
 class AuthService {
   /** refreshToken을 이용해 새로운 토큰을 발급받습니다. */
   async refresh() {
@@ -20,9 +37,7 @@ class AuthService {
       return;
     }
 
-    const { data } = await axios.post(
-      process.env.NEXT_PUBLIC_API_HOST + "/auth/refresh",
-      null,
+    const { data } = await Axios.post(`/auth/refresh`,null,
       {
         headers: {
           Authorization: `Bearer ${refreshToken}`,
@@ -30,36 +45,39 @@ class AuthService {
       }
     );
 
-    cookies.set("accessToken", data.access, { expires: 1 });
-    cookies.set("refreshToken", data.refresh, { expires: 7 });
+    this.setCookies({type: "access", token: data.access, expires: 1});
+    this.setCookies({type: "refresh", token: data.refresh, expires: 7});
   }
 
   /** 새로운 계정을 생성하고 토큰을 발급받습니다. */
-  async signup(
-    email: string,
-    password: string,
-    name: string,
-    phoneNumber: string,
-    agreements: SignupAgreements
-  ) {
-    const { data } = await axios.post(
-      process.env.NEXT_PUBLIC_API_HOST + "/auth/signup",
-      { email, password, name, phoneNumber, agreements }
-    );
+  async signup(params: SignupParams) {
+    const { data } = await Axios.post(`/auth/signup`,params);
 
-    cookies.set("accessToken", data.access, { expires: 1 });
-    cookies.set("refreshToken", data.refresh, { expires: 7 });
+    this.setCookies({type: "access", token: data.access, expires: 1});
+    this.setCookies({type: "refresh", token: data.refresh, expires: 7});
   }
 
   /** 이미 생성된 계정의 토큰을 발급받습니다. */
-  async login(email: string, password: string) {
-    const { data } = await axios.post(
-      process.env.NEXT_PUBLIC_API_HOST + "/auth/login",
-      { email, password }
-    );
+  async login(params : LoginParams) {
+    const { data } = await Axios.post(`/auth/login`,params);
 
-    cookies.set("accessToken", data.access, { expires: 1 });
-    cookies.set("refreshToken", data.refresh, { expires: 7 });
+    this.setCookies({type: "access", token: data.access, expires: 1});
+    this.setCookies({type: "refresh", token: data.refresh, expires: 7});
+  }
+
+  private setCookies({
+    type,
+    token,
+    expires,
+  }: SetCookies){
+    switch(type){
+      case "access":
+        cookies.set("accessToken", token, { expires });
+        break;
+      case "refresh":
+        cookies.set("refreshToken", token, { expires });
+        break;
+    }
   }
 }
 
