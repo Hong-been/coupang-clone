@@ -29,12 +29,14 @@ const Home: NextPage = () => {
     },[])
   
 
-  // const { data: meData } = useQuery("me", UserService.me);
+  const { data: refreshData } = useQuery("refresh", AuthService.refresh,{
+    retry:false
+  });
   // const { data: readData } = useQuery("me", ()=>UserService.read(10));
   // const { status: signupStatus } = useQuery("signup", handleSignup);
   // const { data: loginData ,status: loginStatus } = useQuery("login", handleLogin);
 
-  // console.log("signup", signupStatus);
+  console.log("refreshData", refreshData);
   // console.log("login", loginData,loginStatus );
   // console.log("meData", meData );
   // console.log("readData", readData );
@@ -55,6 +57,8 @@ const Home: NextPage = () => {
           <code className={styles.code}>src/services</code>,
           <code className={styles.code}>src/hooks</code>
         </p>
+        <a href="/signup">Go To Sign up page!</a>
+        <a href="/login">Go To Login page!</a>
       </main>
 
       <footer className={styles.footer}>
