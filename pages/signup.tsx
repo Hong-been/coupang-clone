@@ -3,9 +3,10 @@ import { useCallback,useEffect,useState } from 'react';
 import { useRequest } from '../src/hooks';
 import styles from "../styles/Home.module.css";
 import { SignupInput,AuthService,LoginInput } from "../src/services";
+import {useRouter} from 'next/router';
 
 const correctSample:SignupInput = { 
-  email: `${Math.random}@gmail.com`, 
+  email: `${Math.random()}@hong.com`, 
   password: "111", 
   name:"hong",
   phoneNumber:"342", 
@@ -24,10 +25,11 @@ const wrongSample:SignupInput = {
 }}
 
 const Signup: NextPage = () => {
+  const router=useRouter()
   const [signupInput,setSignupInput] = useState<SignupInput>(wrongSample);
 
-  const { status,refetch:reSignup } = useRequest("signup",()=>AuthService.signup(signupInput));
-    
+  const { status:signupStatus,refetch:reSignup } = useRequest("signup",()=>AuthService.signup(signupInput));
+
   const handleCorrectSignupClick = useCallback(() => {
     setSignupInput(correctSample)
   },[setSignupInput])
@@ -36,15 +38,23 @@ const Signup: NextPage = () => {
     setSignupInput(wrongSample)
   },[setSignupInput])
 
-
   useEffect(()=>{
     reSignup();
   },[reSignup,signupInput])
+
+  useEffect(()=>{
+    if(signupStatus==="success"){
+      if(confirm("로그인하러 이동하시겠습니까?")){
+        router.replace("/login");
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[setSignupInput,signupStatus])
     
   return (
     <h1 className={styles.container}>
       sign up page
-      <p>{status}</p>
+      <p>{signupStatus}</p>
       <button onClick={handleCorrectSignupClick}>Correct SignUp</button>
       <button onClick={handleWrongSignupClick}>Wrong SignUp</button>
       <div>{JSON.stringify(signupInput)}</div>
