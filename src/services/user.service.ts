@@ -1,5 +1,4 @@
-import {apiAxios}  from "./axios";
-import Cookies from "./cookies"
+import Service from "./service";
 import {SignupInput} from "./auth.service"
 
 export interface UserServiceI {
@@ -7,14 +6,14 @@ export interface UserServiceI {
   read: (input:readInput)=>any;
 }
 
-class UserService implements UserServiceI {
+class UserService extends Service implements UserServiceI {
   async me() {
-    const accessToken = Cookies.get("accessToken");
+    const accessToken = this.Cookies.get("accessToken");
     if (!accessToken) {
       return;
     }
 
-    const { data } = await apiAxios.get<userDataReturnType>("/users/me",{
+    const { data } = await this.apiAxios.get<userDataReturnType>("/users/me",{
         headers: {
           Authorization: `Bearer ${accessToken}`,
         }}
@@ -24,7 +23,7 @@ class UserService implements UserServiceI {
   }
 
   async read({id}:readInput) {
-    const { data } = await apiAxios.get<userDataReturnType>(`/users/${id}`);
+    const { data } = await this.apiAxios.get<userDataReturnType>(`/users/${id}`);
     return data;
   }
 }
