@@ -14,7 +14,7 @@ class UserService implements UserServiceI {
       return;
     }
 
-    const { data } = await apiAxios.get<meReturnType>("/users/me",{
+    const { data } = await apiAxios.get<userDataReturnType>("/users/me",{
         headers: {
           Authorization: `Bearer ${accessToken}`,
         }}
@@ -24,15 +24,14 @@ class UserService implements UserServiceI {
   }
 
   async read({id}:readInput) {
-    const { data } = await apiAxios.get(`/users/${id}`);
-    console.log(data)
+    const { data } = await apiAxios.get<userDataReturnType>(`/users/${id}`);
     return data;
   }
 }
 
 export default new UserService();
 
-export type meReturnType = SignupInput & {
+export type userDataReturnType = SignupInput & {
   email: string,
   id: number,
 }
