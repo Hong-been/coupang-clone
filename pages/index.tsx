@@ -1,46 +1,13 @@
 import type { NextPage } from "next";
+import Link from 'next/link' 
 import Head from "next/head";
 import Image from "next/image";
 import { useCallback } from 'react';
 import { useQuery } from "react-query";
 
-import { UserService } from "../src/services";
-import { AuthService,SignupParams } from "../src/services";
-
 import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
-  const handleSignup = useCallback(() => {
-      AuthService.signup({
-        email: "hong@gmail.com", 
-        password: "111", 
-        name:"hong",
-        phoneNumber:"342", 
-        agreements: {
-          privacy: false,
-          ad: false,
-        }})
-    },[])
-  
-    const handleLogin = useCallback(() => {
-      AuthService.login({
-        email: "hong@gmail.com", 
-        password: "111"})
-    },[])
-  
-
-  const { data: refreshData } = useQuery("refresh", AuthService.refresh,{
-    retry:false
-  });
-  // const { data: readData } = useQuery("me", ()=>UserService.read(10));
-  // const { status: signupStatus } = useQuery("signup", handleSignup);
-  // const { data: loginData ,status: loginStatus } = useQuery("login", handleLogin);
-
-  console.log("refreshData", refreshData);
-  // console.log("login", loginData,loginStatus );
-  // console.log("meData", meData );
-  // console.log("readData", readData );
-
   return (
     <div className={styles.container}>
       <Head>
@@ -57,8 +24,12 @@ const Home: NextPage = () => {
           <code className={styles.code}>src/services</code>,
           <code className={styles.code}>src/hooks</code>
         </p>
-        <a href="/signup">Go To Sign up page!</a>
-        <a href="/login">Go To Login page!</a>
+        <Link href="/signup" passHref>
+          <a className={styles.code}>Go To Sign up page! 😈</a>
+        </Link>
+        <Link href="/login" passHref>
+          <a className={styles.code}>Go To Login page!  😈</a>
+        </Link>
       </main>
 
       <footer className={styles.footer}>
