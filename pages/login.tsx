@@ -2,56 +2,72 @@ import type { NextPage } from "next";
 import { useCallback,useEffect,useState } from 'react';
 import { useRequest } from '../src/hooks';
 import styles from "../styles/Home.module.css";
-import { useQuery } from "react-query";
-import { LoginParams } from "../src/services";
+import { UserService,AuthService,LoginInput } from "../src/services";
 
-const correctSample:LoginParams = { 
+const correctSample:LoginInput = { 
   email: "hong1231@gmail.com", 
   password: "111", 
 }
-const wrongPwSample:LoginParams = { 
+const wrongPwSample:LoginInput = { 
   email: "hong1231@gmail.com", 
   password: "1234", 
 }
 
-const wrongEmailSample:LoginParams = { 
+const wrongEmailSample:LoginInput = { 
   email: "hong897982739471@gmail.com", 
   password: "111", 
 }
 
 const Login: NextPage = () => {
-  const [login,setLogin] = useState<LoginParams>(wrongPwSample);
-  const {loginFetch} = useRequest();
+  const [loginInput,setLoginInput] = useState<LoginInput>(wrongPwSample);
   
-  const { data: loginData, status, isLoading,  error, refetch } = useQuery('Login', ()=>loginFetch(login), {
-    enabled:false,
-    retry: false,
-  });
+  const { status,refetch:reLogin, isLoading } = useRequest("login",()=>AuthService.login(loginInput));
+  const { data: meData,refetch: reMe} = useRequest("me",UserService.me);
     
   const handleCorrectLoginClick = useCallback(() => {
-    setLogin(correctSample)
-  },[setLogin])
+    setLoginInput(correctSample)
+  },[setLoginInput])
 
   const handleWrongPwClick = useCallback(()=>{
-    setLogin(wrongPwSample)
-  },[setLogin])
+    setLoginInput(wrongPwSample)
+  },[setLoginInput])
 
   const handleWrongEmailClick = useCallback(()=>{
-    setLogin(wrongEmailSample)
-  },[setLogin])
+    setLoginInput(wrongEmailSample)
+  },[setLoginInput])
 
   useEffect(()=>{
-    refetch()
-  },[login,refetch])
+    reLogin();
+  },[reLogin,loginInput])
 
-    console.log(loginData, status,isLoading, error)
+  useEffect(()=>{
+    if(status==="success"){
+      reMe()
+    }
+  },[status,reMe])
+
   return (
-    <div className={styles.container}>
+    <h1>
       login page
-      <button onClick={handleCorrectLoginClick}>Correct Log In</button>
-      <button onClick={handleWrongPwClick}>Wrong PW Log In</button>
-      <button onClick={handleWrongEmailClick}>Wrong Email Log In</button>
-    </div>
+      <p>
+        {isLoading ? "Loading...🤔" 
+        : status==="success" 
+        ? "로그인 성공! ✅" 
+        : status==="error" && "로그인 실패 ❌"}
+      </p>
+      {status==="success" && 
+      <div className={styles.code}>{JSON.stringify(meData)}</div>}
+      <button 
+        className={styles.code} 
+        onClick={handleCorrectLoginClick}>Correct Log In</button>
+      <button 
+        className={styles.code} 
+        onClick={handleWrongPwClick}>Wrong PW Log In</button>
+      <button 
+        className={styles.code} 
+        onClick={handleWrongEmailClick}>Wrong Email Log In</button>
+      
+    </h1>
   );
 };
 

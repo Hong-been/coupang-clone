@@ -2,10 +2,18 @@ import type { NextPage } from "next";
 import { useCallback,useEffect,useState } from 'react';
 import { useRequest } from '../src/hooks';
 import styles from "../styles/Home.module.css";
-import { useQuery } from "react-query";
-import { SignupParams } from "../src/services";
+import { SignupInput,AuthService,LoginInput } from "../src/services";
 
-const sample:SignupParams = { 
+const correctSample:SignupInput = { 
+  email: `${Math.random}@gmail.com`, 
+  password: "111", 
+  name:"hong",
+  phoneNumber:"342", 
+  agreements: {
+    privacy: false,
+    ad: false,
+}}
+const wrongSample:SignupInput = { 
   email: "hong1231@gmail.com", 
   password: "111", 
   name:"hong",
@@ -16,24 +24,31 @@ const sample:SignupParams = {
 }}
 
 const Signup: NextPage = () => {
-  const [signup,setSignup] = useState<SignupParams>({...sample});
-  const {signupFetch} = useRequest();
-  
-  const { data: signupData, status, error, refetch } = useQuery('signup', ()=>signupFetch(signup), {
-    enabled:false
-  });
-    
-  const handleSignupClick = useCallback(() => {
-    refetch()
-  },[refetch])
-    
+  const [signupInput,setSignupInput] = useState<SignupInput>(wrongSample);
 
-    console.log(signupData, status, error)
+  const { status,refetch:reSignup } = useRequest("signup",()=>AuthService.signup(signupInput));
+    
+  const handleCorrectSignupClick = useCallback(() => {
+    setSignupInput(correctSample)
+  },[setSignupInput])
+
+  const handleWrongSignupClick = useCallback(()=>{
+    setSignupInput(wrongSample)
+  },[setSignupInput])
+
+
+  useEffect(()=>{
+    reSignup();
+  },[reSignup,signupInput])
+    
   return (
-    <div className={styles.container}>
+    <h1 className={styles.container}>
       sign up page
-      <button onClick={handleSignupClick}>SIGN UP</button>
-    </div>
+      <p>{status}</p>
+      <button onClick={handleCorrectSignupClick}>Correct SignUp</button>
+      <button onClick={handleWrongSignupClick}>Wrong SignUp</button>
+      <div>{JSON.stringify(signupInput)}</div>
+    </h1>
   );
 };
 
